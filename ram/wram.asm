@@ -2278,8 +2278,6 @@ wStringBuffer5:: ds STRING_BUFFER_LENGTH
 
 wBattleMenuCursorPosition:: db
 
-	ds 1
-
 wCurBattleMon::
 ; index of the player's mon currently in battle (0-5)
 	db
@@ -2896,6 +2894,12 @@ wRandoFlags::
 wModFlags::
 ; Bit flags for modernization/quality-of-life options.
 ; See constants/randomizer_constants.asm for MODFLAG_* bit definitions.
+	db
+wWildHeldItemRate::
+; Base percentage chance for wild Pokémon to hold an item.
+; See constants/randomizer_constants.asm for WILD_HELD_ITEM_RATE_* values.
+; Applied to both the standard roll (Item1/Item2) and mod roll (Item3/Item4).
+; 0 = 10%, 1 = 25% (default), 2 = 50%, 3 = 100%
 	db
 wRareCandyMart::
 ; 0 = DISABLED (Rare Candy not sold at marts)

@@ -39,7 +39,17 @@ DEF MODFLAG_AUTO_NICKNAME_F          EQU 2 ; set = random nicknames on catch/hat
 DEF MODFLAG_WILD_ITEM_DROP_F         EQU 4 ; set = wild #MON drop held items on KO
 DEF MODFLAG_TM_VENDOR_F              EQU 5 ; set = TM vendor NPC enabled in Blackthorn Mart
 DEF MODFLAG_WILD_HELD_ITEM_RAND_F    EQU 6 ; set = wild #MON held items are randomized
-DEF MODFLAG_WILD_HELD_ITEM_MOD_F     EQU 7 ; set = wild #MON have a 25% chance to hold their Item3
+DEF MODFLAG_WILD_HELD_ITEM_MOD_F     EQU 7 ; set = wild #MON held items use Item3/Item4 (rate set by wWildHeldItemRate)
+
+; Wild held item base rate (stored in wWildHeldItemRate, see ram/wram.asm)
+DEF WILD_HELD_ITEM_RATE_10  EQU 0 ; 10% chance to hold an item
+DEF WILD_HELD_ITEM_RATE_25  EQU 1 ; 25% chance (default, matches standard Item1/Item2 rate)
+DEF WILD_HELD_ITEM_RATE_35  EQU 2 ; 35% chance
+DEF WILD_HELD_ITEM_RATE_50  EQU 3 ; 50% chance
+DEF WILD_HELD_ITEM_RATE_65  EQU 4 ; 65% chance
+DEF WILD_HELD_ITEM_RATE_75  EQU 5 ; 75% chance
+DEF WILD_HELD_ITEM_RATE_100 EQU 6 ; 100% chance (always holds an item)
+DEF NUM_WILD_HELD_ITEM_RATES EQU 7
 
 ; HM requirement mode (stored in wHMMode)
 DEF HM_MODE_REQUIRED  EQU 0 ; default: party mon must KNOW the HM move
