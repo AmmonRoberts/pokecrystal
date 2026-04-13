@@ -30,7 +30,15 @@ DEF NUM_NEWGAMEOPTIONS_PAGE2 EQU const_value ; 5
 	const NEWGAMEOPT_PAGE3_CONTINUE   ; 6
 DEF NUM_NEWGAMEOPTIONS_PAGE3 EQU const_value ; 7
 
-; Page 4: Nuzlocke/Challenge options
+; Page 4: Modernization options (continued)
+	const_def
+	const NEWGAMEOPT_TM_VENDOR           ; 0
+	const NEWGAMEOPT_WILD_HELD_ITEM_MOD  ; 1
+	const NEWGAMEOPT_HELD_ITEM_RATE      ; 2
+	const NEWGAMEOPT_PAGE4_CONTINUE      ; 3
+DEF NUM_NEWGAMEOPTIONS_PAGE4 EQU const_value ; 4
+
+; Page 5: Nuzlocke/Challenge options
 	const_def
 	const NEWGAMEOPT_PERMADEATH       ; 0
 	const NEWGAMEOPT_RESET_ON_WIPE    ; 1
@@ -38,14 +46,8 @@ DEF NUM_NEWGAMEOPTIONS_PAGE3 EQU const_value ; 7
 	const NEWGAMEOPT_FIRST_ENCOUNTER  ; 3
 	const NEWGAMEOPT_HM_REQUIRED      ; 4
 	const NEWGAMEOPT_OW_MOVE_REQUIRED ; 5
-	const NEWGAMEOPT_PAGE4_CONTINUE   ; 6
-DEF NUM_NEWGAMEOPTIONS_PAGE4 EQU const_value ; 7
-
-; Page 5: Miscellaneous options
-	const_def
-	const NEWGAMEOPT_TM_VENDOR        ; 0
-	const NEWGAMEOPT_PAGE5_CONTINUE   ; 1
-DEF NUM_NEWGAMEOPTIONS_PAGE5 EQU const_value ; 2
+	const NEWGAMEOPT_PAGE5_CONTINUE   ; 6
+DEF NUM_NEWGAMEOPTIONS_PAGE5 EQU const_value ; 7
 
 DEF NUM_NEWGAMEOPTIONS EQU NUM_NEWGAMEOPTIONS_PAGE1 ; For compatibility
 
@@ -264,7 +266,17 @@ StringNewGameOptionsPage3:
 	db "CONTINUE@"
 
 StringNewGameOptionsPage4:
-	db "CHALLENGE     4/5<LF>"
+	db "MODERNIZATION 4/5<LF>"
+	db "TM VENDOR<LF>"
+	db "     :<LF>"
+	db "MORE HLD ITMS<LF>"
+	db "     :<LF>"
+	db "HLD ITM RATE<LF>"
+	db "     :<LF>"
+	db "CONTINUE@"
+
+StringNewGameOptionsPage5:
+	db "CHALLENGE     5/5<LF>"
 	db "PERMADEATH<LF>"
 	db "     :<LF>"
 	db "RESET ON WIPE<LF>"
@@ -276,12 +288,6 @@ StringNewGameOptionsPage4:
 	db "REQUIRE HMS<LF>"
 	db "     :<LF>"
 	db "REQ FIELD TMS<LF>"
-	db "     :<LF>"
-	db "CONTINUE@"
-
-StringNewGameOptionsPage5:
-	db "CHALLENGE     5/5<LF>"
-	db "TM VENDOR<LF>"
 	db "     :<LF>"
 	db "CONTINUE@"
 
@@ -334,18 +340,20 @@ GetNewGameOptionPointer:
 	dw NewGameOptions_Continue
 
 .PointersPage4:
-; entries correspond to NEWGAMEOPT_* constants (Page 4 - Nuzlocke/Challenge)
+; entries correspond to NEWGAMEOPT_* constants (Page 4 - Modernization continued)
+	dw NewGameOptions_TMVendor
+	dw NewGameOptions_WildHeldItemMod
+	dw NewGameOptions_HeldItemRate
+	dw NewGameOptions_Continue
+
+.PointersPage5:
+; entries correspond to NEWGAMEOPT_* constants (Page 5 - Nuzlocke/Challenge)
 	dw NewGameOptions_Permadeath
 	dw NewGameOptions_ResetOnWipe
 	dw NewGameOptions_PartyLimit
 	dw NewGameOptions_FirstEncounter
 	dw NewGameOptions_HMRequired
 	dw NewGameOptions_OWMoveRequired
-	dw NewGameOptions_Continue
-
-.PointersPage5:
-; entries correspond to NEWGAMEOPT_* constants (Page 5 - Miscellaneous)
-	dw NewGameOptions_TMVendor
 	dw NewGameOptions_Continue
 NewGameOptions_BerryRandomization:
 	ldh a, [hJoyPressed]
@@ -1076,6 +1084,90 @@ NewGameOptions_FirstEncounter:
 .str_disabled:  db "DISABLED  @"
 .str_forgiving: db "FORGIVING @"
 .str_strict:    db "STRICT    @"
+
+NewGameOptions_WildHeldItemMod:
+; Toggles whether wild #MON use Item3/Item4 for held items (DISABLED / ENABLED).
+	ldh a, [hJoyPressed]
+	bit B_PAD_LEFT, a
+	jr nz, .Toggle
+	bit B_PAD_RIGHT, a
+	jr z, .NonePressed
+.Toggle:
+	ld hl, wModFlags
+	ld a, [hl]
+	xor 1 << MODFLAG_WILD_HELD_ITEM_MOD_F
+	ld [hl], a
+.NonePressed:
+	ld a, [wModFlags]
+	bit MODFLAG_WILD_HELD_ITEM_MOD_F, a
+	jr nz, .Enabled
+	ld de, .Disabled
+	jr .Display
+.Enabled:
+	ld de, .Enabled_str
+.Display:
+	hlcoord 8, 6
+	call PlaceString
+	and a
+	ret
+.Disabled:    db "DISABLED@"
+.Enabled_str: db "ENABLED @"
+
+NewGameOptions_HeldItemRate:
+; Cycles the base held item chance: 10% / 25% / 35% / 50% / 65% / 75% / 100%.
+; Applies to both the standard (Item1/Item2) and mod (Item3/Item4) roll.
+	ldh a, [hJoyPressed]
+	bit B_PAD_RIGHT, a
+	jr nz, .Right
+	bit B_PAD_LEFT, a
+	jr nz, .Left
+	jr .Display
+.Right:
+	ld a, [wWildHeldItemRate]
+	inc a
+	cp NUM_WILD_HELD_ITEM_RATES
+	jr c, .set
+	xor a
+	jr .set
+.Left:
+	ld a, [wWildHeldItemRate]
+	and a
+	jr z, .WrapLeft
+	dec a
+	jr .set
+.WrapLeft:
+	ld a, NUM_WILD_HELD_ITEM_RATES - 1
+.set:
+	ld [wWildHeldItemRate], a
+.Display:
+	ld a, [wWildHeldItemRate]
+	ld e, a
+	ld d, 0
+	ld hl, .Strings
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	hlcoord 8, 8
+	call PlaceString
+	and a
+	ret
+.Strings:
+	dw .str_10
+	dw .str_25
+	dw .str_35
+	dw .str_50
+	dw .str_65
+	dw .str_75
+	dw .str_100
+.str_10:  db "10%  @"
+.str_25:  db "25%  @"
+.str_35:  db "35%  @"
+.str_50:  db "50%  @"
+.str_65:  db "65%  @"
+.str_75:  db "75%  @"
+.str_100: db "100% @"
 
 NewGameOptions_TMVendor:
 ; Toggles whether the TM vendor NPC appears in Blackthorn Mart (DISABLED / ENABLED).

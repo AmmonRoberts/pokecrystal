@@ -15,10 +15,12 @@ DEF BASE_TYPE_1      rb
 DEF BASE_TYPE_2      rb
 DEF BASE_CATCH_RATE  rb
 DEF BASE_EXP         rb
-DEF BASE_ITEMS       rw
+DEF BASE_ITEMS       rb 4
 rsset BASE_ITEMS
 DEF BASE_ITEM_1      rb
 DEF BASE_ITEM_2      rb
+DEF BASE_ITEM_3      rb
+DEF BASE_ITEM_4      rb
 DEF BASE_GENDER      rb
                      rb_skip
 DEF BASE_EGG_STEPS   rb

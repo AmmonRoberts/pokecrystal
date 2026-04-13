@@ -28,6 +28,8 @@ InitCrystalData:
 	ld [wNuzlockeMode], a  ; default = NUZLOCKE_DISABLED
 	ld [wHMMode], a        ; default = HM_MODE_REQUIRED
 	ld [wOWMoveMode], a    ; default = HM_MODE_REQUIRED
+	ld a, WILD_HELD_ITEM_RATE_25
+	ld [wWildHeldItemRate], a
 	; Zero wNuzlockeAreas and wNuzlockeLinesCaught (both in WRAMX 2)
 	ldh a, [rWBK]
 	push af
