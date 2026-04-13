@@ -6,6 +6,7 @@
 	const DEBUGROOMMENU_PAGE_4 ; 3
 	const DEBUGROOMMENU_PAGE_5 ; 4
 	const DEBUGROOMMENU_PAGE_6 ; 5
+	const DEBUGROOMMENU_PAGE_7 ; 6
 DEF DEBUGROOMMENU_NUM_PAGES EQU const_value
 
 	; _DebugRoom.Strings and _DebugRoom.Jumptable indexes
@@ -90,10 +91,14 @@ _DebugRoom::
 	cp DEBUGROOMMENU_PAGE_5
 	jr z, .page5_status
 	cp DEBUGROOMMENU_PAGE_6
+	jr z, .page6_status
+	cp DEBUGROOMMENU_PAGE_7
 	jr nz, .status_done
+.page7_status
+	call DebugRoom_PrintHeldItemRate
+	jr .status_done
 .page6_status
 	call DebugRoom_PrintBossRando
-	call DebugRoom_PrintHeldItemRate
 	call DebugRoom_PrintGiftRando
 	call DebugRoom_PrintWildItemDrop
 	call DebugRoom_PrintWildHeldItemRand
@@ -246,7 +251,7 @@ _DebugRoom::
 	db "FIELD TMS@"
 	db "HELD ITEM RND@"
 	db "MODERN HELD@"
-
+	db "ITEM RATE@"
 .Jumptable:
 ; entries correspond to DEBUGROOMMENUITEM_* constants
 	dw DebugRoomMenu_SpClear
@@ -359,15 +364,20 @@ _DebugRoom::
 	db -1
 
 	; DEBUGROOMMENU_PAGE_6
-	db 9
+	db 8
 	db DEBUGROOMMENUITEM_BOSS_RANDO
 	db DEBUGROOMMENUITEM_GIFT_RANDO
 	db DEBUGROOMMENUITEM_WILD_ITEM_DROP
 	db DEBUGROOMMENUITEM_WILD_HELD_ITEM_RAND
 	db DEBUGROOMMENUITEM_WILD_HELD_ITEM_MOD
-	db DEBUGROOMMENUITEM_HELD_ITEM_RATE
 	db DEBUGROOMMENUITEM_HM_MODE
 	db DEBUGROOMMENUITEM_OW_MOVE_MODE
+	db DEBUGROOMMENUITEM_NEXT
+	db -1
+
+	; DEBUGROOMMENU_PAGE_7
+	db 2
+	db DEBUGROOMMENUITEM_HELD_ITEM_RATE
 	db DEBUGROOMMENUITEM_NEXT
 	db -1
 
@@ -763,12 +773,12 @@ DebugRoomMenu_WildItemDrop:
 	ret
 
 DebugRoom_PrintWildItemDrop:
-	hlcoord 16, 12
+	hlcoord 16, 4
 	ld de, .Label
 	call PlaceString
 	ld a, [wModFlags]
 	bit MODFLAG_WILD_ITEM_DROP_F, a
-	hlcoord 16, 13
+	hlcoord 16, 5
 	ld de, .OffString
 	jr z, .ok
 	ld de, .OnString
@@ -788,12 +798,12 @@ DebugRoomMenu_WildHeldItemRand:
 	ret
 
 DebugRoom_PrintWildHeldItemRand:
-	hlcoord 16, 9
+	hlcoord 16, 6
 	ld de, .Label
 	call PlaceString
 	ld a, [wModFlags]
 	bit MODFLAG_WILD_HELD_ITEM_RAND_F, a
-	hlcoord 16, 10
+	hlcoord 16, 7
 	ld de, .OffString
 	jr z, .ok
 	ld de, .OnString
@@ -823,7 +833,7 @@ DebugRoomMenu_HeldItemRate:
 	ret
 
 DebugRoom_PrintHeldItemRate:
-	hlcoord 16, 2
+	hlcoord 16, 0
 	ld de, .Label
 	call PlaceString
 	ld a, [wWildHeldItemRate]
@@ -835,7 +845,7 @@ DebugRoom_PrintHeldItemRate:
 	ld a, [hli]
 	ld d, [hl]
 	ld e, a
-	hlcoord 16, 3
+	hlcoord 16, 1
 	call PlaceString
 	ret
 
@@ -857,12 +867,12 @@ DebugRoom_PrintHeldItemRate:
 .str_100: db "100%@"
 
 DebugRoom_PrintWildHeldItemMod:
-	hlcoord 16, 14
+	hlcoord 16, 8
 	ld de, .Label
 	call PlaceString
 	ld a, [wModFlags]
 	bit MODFLAG_WILD_HELD_ITEM_MOD_F, a
-	hlcoord 16, 15
+	hlcoord 16, 9
 	ld de, .OffString
 	jr z, .ok
 	ld de, .OnString
@@ -886,7 +896,7 @@ DebugRoomMenu_HMMode:
 	ret
 
 DebugRoom_PrintHMMode:
-	hlcoord 16, 4
+	hlcoord 16, 10
 	ld de, .Label
 	call PlaceString
 	ld a, [wHMMode]
@@ -898,7 +908,7 @@ DebugRoom_PrintHMMode:
 	ld a, [hli]
 	ld d, [hl]
 	ld e, a
-	hlcoord 16, 5
+	hlcoord 16, 11
 	call PlaceString
 	ret
 
@@ -923,7 +933,7 @@ DebugRoomMenu_OWMoveMode:
 	ret
 
 DebugRoom_PrintOWMoveMode:
-	hlcoord 16, 6
+	hlcoord 16, 15
 	ld de, .Label
 	call PlaceString
 	ld a, [wOWMoveMode]
@@ -935,7 +945,7 @@ DebugRoom_PrintOWMoveMode:
 	ld a, [hli]
 	ld d, [hl]
 	ld e, a
-	hlcoord 16, 7
+	hlcoord 16, 16
 	call PlaceString
 	ret
 
@@ -1069,7 +1079,7 @@ DebugRoomMenu_GiftRando:
 	ret
 
 DebugRoom_PrintGiftRando:
-	hlcoord 16, 15
+	hlcoord 16, 2
 	ld de, .Label
 	call PlaceString
 	ld a, [wGiftRandMode]
@@ -1081,7 +1091,7 @@ DebugRoom_PrintGiftRando:
 	ld a, [hli]
 	ld d, [hl]
 	ld e, a
-	hlcoord 16, 16
+	hlcoord 16, 3
 	call PlaceString
 	ret
 
