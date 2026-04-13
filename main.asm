@@ -297,6 +297,11 @@ INCLUDE "gfx/battle_anims.asm"
 INCLUDE "engine/events/halloffame.asm"
 
 
+SECTION "New Game Descs", ROMX
+
+INCLUDE "engine/menus/newgame_option_descs.asm"
+
+
 SECTION "Crystal Features 2", ROMX
 
 INCLUDE "engine/events/kurt.asm"
