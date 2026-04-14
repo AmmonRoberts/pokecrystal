@@ -2163,6 +2163,7 @@ wMenuItemsList:: ds 16
 wMenuItemsListEnd::
 
 wNewGameOptionsPage:: db ; 0 = page 1, 1 = page 2
+wNewGameCursorRestore:: db ; cursor+1 to restore after desc display; 0 = no restore
 
 NEXTU
 ; fruit tree data

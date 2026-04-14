@@ -149,6 +149,15 @@ _NewGameOptions:
 
 	xor a
 	ld [wJumptableIndex], a
+	; Restore cursor if returning from description display
+	ld a, [wNewGameCursorRestore]
+	and a
+	jr z, .no_cursor_restore
+	dec a
+	ld [wJumptableIndex], a
+	xor a
+	ld [wNewGameCursorRestore], a
+.no_cursor_restore:
 	inc a
 	ldh [hBGMapMode], a
 	call WaitBGMap
@@ -164,11 +173,25 @@ _NewGameOptions:
 	ldh a, [hJoyPressed]
 	and PAD_B
 	jr nz, .handle_b
+	ldh a, [hJoyPressed]
+	and PAD_A
+	jr nz, .handle_a
 	call NewGameOptionsControl
 	jr c, .dpad
 	call GetNewGameOptionPointer
 	jr c, .handle_continue_button
 	jr .dpad
+
+.handle_a
+	; A pressed: if on Continue, advance page; otherwise show description
+	call NewGameOptions_IsOnContinue
+	jr c, .handle_continue_button
+	; Save cursor position so .refresh_page can restore it
+	ld a, [wJumptableIndex]
+	inc a ; store index+1 so 0 means "no restore"
+	ld [wNewGameCursorRestore], a
+	farcall ShowNewGameOptionDescription
+	jp .refresh_page
 
 .handle_start
 	; START advances to next page or starts game
@@ -1440,3 +1463,27 @@ NewGameOptions_UpdateCursorPosition:
 	call AddNTimes
 	ld [hl], $ed ; filled right arrow
 	ret
+
+NewGameOptions_IsOnContinue:
+; Returns carry set if wJumptableIndex is the Continue button for the current page.
+	ld a, [wJumptableIndex]
+	ld b, a
+	ld a, [wNewGameOptionsPage]
+	ld e, a
+	ld d, 0
+	ld hl, .ContinueTable
+	add hl, de
+	ld a, [hl]
+	cp b
+	jr z, .yes
+	and a
+	ret
+.yes:
+	scf
+	ret
+.ContinueTable:
+	db NEWGAMEOPT_PAGE1_CONTINUE  ; page 0
+	db NEWGAMEOPT_PAGE2_CONTINUE  ; page 1
+	db NEWGAMEOPT_PAGE3_CONTINUE  ; page 2
+	db NEWGAMEOPT_PAGE4_CONTINUE  ; page 3
+	db NEWGAMEOPT_PAGE5_CONTINUE  ; page 4
