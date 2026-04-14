@@ -104,7 +104,7 @@ GetNewGameOptionDescString:
 	db "Randomizes wild<LF>"
 	db "#MON species in<LF>"
 	db "grass, water,<LF>"
-	db "and caves.@"
+	db "rocks and caves.@"
 
 .desc_starter:
 	db "Randomizes starter<LF>"
@@ -135,10 +135,10 @@ GetNewGameOptionDescString:
 	db "ground.@"
 
 .desc_gift:
-	db "Changes how gift<LF>"
-	db "#MON work.<LF>"
-	db "Randomized swaps<LF>"
-	db "species; Disabled.@"
+	db "Randomizes or<LF>"
+	db "disables gift<LF>"
+	db "#MON. No effect<LF>"
+	db "on starters.@"
 
 .desc_type_rand:
 	db "Randomizes type<LF>"
@@ -171,21 +171,21 @@ GetNewGameOptionDescString:
 
 .desc_money_mult:
 	db "Multiplies money<LF>"
-	db "earned and spent.<LF>"
+	db "earned.<LF>"
 	db "From x0.50<LF>"
 	db "to x1.50.@"
 
 .desc_rare_candy:
 	db "Adds Rare Candy to<LF>"
-	db "a shop. Modes:<LF>"
+	db "shops. Modes:<LF>"
 	db "Cheap, Pricey,<LF>"
 	db "or Free.@"
 
 .desc_poison:
 	db "Poison stops at<LF>"
 	db "1 HP; your #MON<LF>"
-	db "won't faint from<LF>"
-	db "poison damage.@"
+	db "won't faint if<LF>"
+	db "walking.@"
 
 .desc_wild_drop:
 	db "Wild #MON drop<LF>"
@@ -200,38 +200,38 @@ GetNewGameOptionDescString:
 	db "TMs.@"
 
 .desc_more_held:
-	db "Wild #MON can hold<LF>"
-	db "extra items using<LF>"
-	db "Item3 and Item4<LF>"
-	db "slots.@"
+	db "Wild #MON can<LF>"
+	db "hold new items.<LF>"
+	db "Most #MON<LF>"
+	db "drop something.@"
 
 .desc_held_rate:
 	db "Base chance for<LF>"
-	db "wild #MON to hold<LF>"
-	db "an item when<LF>"
+	db "wild #MON to<LF>"
+	db "hold an item when<LF>"
 	db "encountered.@"
 
 .desc_permadeath:
-	db "Fainted #MON are<LF>"
-	db "permanently lost.<LF>"
-	db "They are removed<LF>"
-	db "entirely.@"
+	db "Fainted #MON<LF>"
+	db "are permanently<LF>"
+	db "lost. They are<LF>"
+	db "removed entirely.@"
 
 .desc_reset_wipe:
 	db "When your last<LF>"
-	db "#MON faints, the<LF>"
-	db "game auto-resets<LF>"
-	db "to last save.@"
+	db "#MON faints,<LF>"
+	db "the saved game <LF>"
+	db "is auto-deleted.@"
 
 .desc_party_limit:
-	db "Maximum #MON you<LF>"
-	db "can have in your<LF>"
-	db "party at once<LF>"
+	db "Maximum #MON<LF>"
+	db "you can have in<LF>"
+	db "your party at once<LF>"
 	db "(1 to 6).@"
 
 .desc_first_enc:
-	db "Nuzlocke: only the<LF>"
-	db "first #MON met in<LF>"
+	db "Only the first<LF>"
+	db "#MON met in<LF>"
 	db "each area can be<LF>"
 	db "caught.@"
 
@@ -244,5 +244,5 @@ GetNewGameOptionDescString:
 .desc_ow_move:
 	db "Rock Smash and<LF>"
 	db "Headbutt rules.<LF>"
-	db "Off: badge only.<LF>"
+	db "Off: no TM needed.<LF>"
 	db "Learn: can learn.@"

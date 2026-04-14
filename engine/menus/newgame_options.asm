@@ -149,6 +149,15 @@ _NewGameOptions:
 
 	xor a
 	ld [wJumptableIndex], a
+	; Restore cursor if returning from description display
+	ld a, [wNewGameCursorRestore]
+	and a
+	jr z, .no_cursor_restore
+	dec a
+	ld [wJumptableIndex], a
+	xor a
+	ld [wNewGameCursorRestore], a
+.no_cursor_restore:
 	inc a
 	ldh [hBGMapMode], a
 	call WaitBGMap
@@ -177,6 +186,10 @@ _NewGameOptions:
 	; A pressed: if on Continue, advance page; otherwise show description
 	call NewGameOptions_IsOnContinue
 	jr c, .handle_continue_button
+	; Save cursor position so .refresh_page can restore it
+	ld a, [wJumptableIndex]
+	inc a ; store index+1 so 0 means "no restore"
+	ld [wNewGameCursorRestore], a
 	farcall ShowNewGameOptionDescription
 	jp .refresh_page
 
