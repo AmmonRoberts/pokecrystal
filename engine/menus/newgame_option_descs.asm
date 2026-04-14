@@ -8,15 +8,15 @@ ShowNewGameOptionDescription:
 	call GetNewGameOptionDescString ; loads de with description string pointer
 	push de
 
-	; Draw description overlay textbox (rows 12–17, full width)
-	hlcoord 0, 12
-	ld b, 4   ; 4 content lines (rows 13–16)
+	; Draw description overlay textbox (rows 11–17, full width)
+	hlcoord 0, 11
+	ld b, 5   ; 4 content lines (rows 12–16)
 	ld c, 18  ; inner width
 	call Textbox
 
 	; Place description text
 	pop de
-	hlcoord 1, 13
+	hlcoord 1, 12
 	call PlaceString
 
 	; Trigger BG map update
@@ -98,7 +98,7 @@ GetNewGameOptionDescString:
 	dw .desc_hm_req
 	dw .desc_ow_move
 
-; ---- Description strings (max 18 chars per line) ----
+; ---- Description strings (max 18 chars per line, with 5 lines) ----
 
 .desc_wild_enc:
 	db "Randomizes wild<LF>"
@@ -108,8 +108,8 @@ GetNewGameOptionDescString:
 
 .desc_starter:
 	db "Randomizes starter<LF>"
-	db "#MON at Prof.<LF>"
-	db "Elm's lab.@"
+	db "#MON at PROF.<LF>"
+	db "ELM's lab.@"
 
 .desc_trainer:
 	db "Randomizes regular<LF>"
@@ -120,10 +120,10 @@ GetNewGameOptionDescString:
 	db "Randomizes gym<LF>"
 	db "leader, Elite 4,<LF>"
 	db "rival, and<LF>"
-	db "Red's parties.@"
+	db "RED's parties.@"
 
 .desc_berry:
-	db "Randomizes berries<LF>"
+	db "Randomizes BERRIES<LF>"
 	db "found growing on<LF>"
 	db "trees throughout<LF>"
 	db "the world.@"
@@ -143,7 +143,7 @@ GetNewGameOptionDescString:
 .desc_type_rand:
 	db "Randomizes type<LF>"
 	db "matchup chart.<LF>"
-	db "Balanced: at most<LF>"
+	db "BALANCED: at most<LF>"
 	db "2 immunities.@"
 
 .desc_nickname:
@@ -158,25 +158,25 @@ GetNewGameOptionDescString:
 	db "by wild #MON.@"
 
 .desc_tm_mode:
-	db "Unlimited: TMs are<LF>"
-	db "reused. Standard:<LF>"
+	db "UNLIMITED: TMs are<LF>"
+	db "reused. STANDARD:<LF>"
 	db "each TM is<LF>"
 	db "consumed on use.@"
 
 .desc_exp_mult:
-	db "Scales experience<LF>"
-	db "gained from all<LF>"
-	db "battles from<LF>"
-	db "x0.50 to x1.50.@"
+	db "Multiplies EXP.<LF>"
+	db "gained in battle.<LF>"
+	db "From x0.50<LF>"
+	db "to x1.50.@"
 
 .desc_money_mult:
-	db "Multiplies money<LF>"
+	db "Multiplies ¥<LF>"
 	db "earned.<LF>"
 	db "From x0.50<LF>"
 	db "to x1.50.@"
 
 .desc_rare_candy:
-	db "Adds Rare Candy to<LF>"
+	db "Adds RARE CANDY to<LF>"
 	db "shops. Modes:<LF>"
 	db "Cheap, Pricey,<LF>"
 	db "or Free.@"
@@ -195,7 +195,7 @@ GetNewGameOptionDescString:
 
 .desc_tm_vendor:
 	db "Adds a vendor NPC<LF>"
-	db "in Blackthorn Mart<LF>"
+	db "in BLACKTHORN MART<LF>"
 	db "who sells all<LF>"
 	db "TMs.@"
 
@@ -214,13 +214,13 @@ GetNewGameOptionDescString:
 .desc_permadeath:
 	db "Fainted #MON<LF>"
 	db "are permanently<LF>"
-	db "lost. They are<LF>"
-	db "removed entirely.@"
+	db "lost. Held items<LF>"
+	db "are recovered.@"
 
 .desc_reset_wipe:
 	db "When your last<LF>"
 	db "#MON faints,<LF>"
-	db "the saved game <LF>"
+	db "the saved game<LF>"
 	db "is auto-deleted.@"
 
 .desc_party_limit:
@@ -236,13 +236,14 @@ GetNewGameOptionDescString:
 	db "caught.@"
 
 .desc_hm_req:
-	db "Controls HM rules.<LF>"
-	db "Off: badge only.<LF>"
-	db "Learn: must be<LF>"
+	db "DISABLED: Only<LF>"
+	db "badge required.<LF>"
+	db "LEARNABLE: Must be<LF>"
 	db "able to learn.@"
 
 .desc_ow_move:
-	db "Rock Smash and<LF>"
-	db "Headbutt rules.<LF>"
-	db "Off: no TM needed.<LF>"
-	db "Learn: can learn.@"
+	db "HEADBUTT and ROCK<LF>"
+    db "SMASH. DISABLED: <LF>"
+	db "no TM needed.<LF>"
+	db "LEARNABLE: Must be<LF>"
+	db "able to learn.@"
