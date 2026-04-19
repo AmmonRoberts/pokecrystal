@@ -197,14 +197,16 @@ HandleMapTimeAndJoypad:
 
 	call UpdateTime
 	call GetJoypad
-if DEF(_DEBUG)
 	call .DebugRoom
-endc
 	call TimeOfDayPals
 	ret
 
-if DEF(_DEBUG)
 .DebugRoom:
+if !DEF(_DEBUG)
+	ld a, [wDebugFlags]
+	bit DEBUG_MENU_UNLOCKED_F, a
+	ret z
+endc
 	ldh a, [hJoyDown]
 	and PAD_SELECT | PAD_START
 	cp PAD_SELECT | PAD_START
@@ -220,7 +222,6 @@ if DEF(_DEBUG)
 	ld a, MAPSTATUS_ENTER
 	ld [wMapStatus], a
 	ret
-endc
 
 HandleMapObjects:
 	farcall HandleNPCStep

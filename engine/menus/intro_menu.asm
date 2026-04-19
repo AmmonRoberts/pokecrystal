@@ -87,7 +87,19 @@ NewGame:
 
 	ld a, MAPSETUP_WARP
 	ldh [hMapEntryMethod], a
+	call RestoreDebugMenuFlag
 	jp FinishContinueFunction
+
+RestoreDebugMenuFlag:
+	ld a, BANK(sDebugMenuUnlocked)
+	call OpenSRAM
+	ld a, [sDebugMenuUnlocked]
+	call CloseSRAM
+	and a
+	ret z
+	ld hl, wDebugFlags
+	set DEBUG_MENU_UNLOCKED_F, [hl]
+	ret
 
 PlayerProfileSetup:
 	; Show new game options menu first
@@ -358,6 +370,7 @@ Continue:
 	farcall TryLoadSaveFile
 	jr c, .FailToLoad
 	farcall _LoadData
+	call RestoreDebugMenuFlag
 	call SanitizeGiftRandMode
 	call LoadStandardMenuHeader
 	call DisplaySaveInfoOnContinue

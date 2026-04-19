@@ -676,9 +676,7 @@ INCLUDE "engine/pokemon/european_mail.asm"
 
 SECTION "Debug Room", ROMX
 
-if DEF(_DEBUG)
 INCLUDE "engine/debug/debug_room.asm"
-endc
 
 
 SECTION "Battle Tower Text", ROMX

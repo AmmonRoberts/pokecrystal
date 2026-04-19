@@ -1146,7 +1146,6 @@ UnmaskObject::
 	ld [hl], 0 ; unmasked
 	ret
 
-if DEF(_DEBUG)
 ComputeROMXChecksum::
 	ldh a, [hROMBank]
 	push af
@@ -1166,7 +1165,6 @@ ComputeROMXChecksum::
 	pop af
 	rst Bankswitch
 	ret
-endc
 
 ScrollMapUp::
 	hlcoord 0, 0
