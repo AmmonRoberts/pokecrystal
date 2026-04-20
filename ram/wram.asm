@@ -1259,7 +1259,6 @@ wccb9:: ds 1
 wccba:: ds 90
 
 
-if DEF(_DEBUG)
 SECTION UNION "Overworld Map", WRAM0
 
 ; debug room RTC values
@@ -1306,8 +1305,6 @@ NEXTU
 wDebugRoomBadges::            ds NUM_BADGES
 wDebugRoomBadgesInitialized:: db
 ENDU
-
-endc
 
 
 SECTION "Video", WRAM0

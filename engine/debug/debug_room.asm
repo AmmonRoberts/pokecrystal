@@ -3074,3 +3074,89 @@ PrintHexNumber:
 
 .HexDigits:
 	db "0123456789ABCDEF"
+
+MainMenu_ToggleDebugMenu::
+	; Show "please wait" message instantly (no button prompt)
+	ld hl, .WaitText
+	call PrintText
+
+	; Toggle the flag
+	ld hl, wDebugFlags
+	ld a, [hl]
+	xor 1 << DEBUG_MENU_UNLOCKED_F
+	ld [hl], a
+	push af
+
+	; Write new state to SRAM
+	ld a, BANK(sDebugMenuUnlocked)
+	call OpenSRAM
+	ld a, [wDebugFlags]
+	bit DEBUG_MENU_UNLOCKED_F, a
+	ld a, 0
+	jr z, .write
+	inc a
+.write
+	ld [sDebugMenuUnlocked], a
+	call CloseSRAM
+
+	; Play SFX while we prepare the confirmation message
+	ld de, SFX_LEVEL_UP
+	call PlaySFX
+	call WaitSFX
+
+	; Show confirmation (reuse existing textbox, waits for A/B)
+	pop af
+	bit DEBUG_MENU_UNLOCKED_F, a
+	ld hl, .DisabledText
+	jr z, .show
+	ld hl, .EnabledText
+.show
+	call PrintText
+
+	; Wait up to ~3 seconds (180 frames) or until A/B is pressed
+	ld b, 180
+.wait
+	call DelayFrame
+	call GetJoypad
+	ldh a, [hJoyPressed]
+	and PAD_A | PAD_B
+	jr nz, .dismiss
+	dec b
+	jr nz, .wait
+.dismiss
+	; Sync hJoyDown to real hardware state so the next GetJoypad delta is 0,
+	; preventing the dismiss button from leaking back into the main menu loop.
+	ldh a, [hJoypadDown]
+	ldh [hJoyDown], a
+	xor a
+	ldh [hJoyPressed], a
+	ldh [hJoyReleased], a
+	ldh [hJoyLast], a
+	ldh [hJoypadPressed], a
+	ldh [hJoypadReleased], a
+	ldh [hJoypadSum], a
+	ret
+
+.WaitText:
+	text_far .strWait
+	text_end
+.strWait:
+	text "Updating debug"
+	line "menu setting..."
+	done
+
+.EnabledText:
+	text_far .strEnabled
+	text_end
+.strEnabled:
+	text "Debug menu"
+	line "enabled."
+	done
+
+.DisabledText:
+	text_far .strDisabled
+	text_end
+.strDisabled:
+	text "Debug menu"
+	line "disabled."
+	done

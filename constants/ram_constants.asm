@@ -5,6 +5,7 @@ DEF AUTO_INPUT EQU $ff
 	const_def
 	const DEBUG_BATTLE_F
 	const DEBUG_FIELD_F
+	const DEBUG_MENU_UNLOCKED_F
 
 ; wCurDexMode::
 	const_def

@@ -225,6 +225,15 @@ MainMenuJoypadLoop:
 	set _2DMENU_WRAP_UP_DOWN_F, a
 	ld [w2DMenuFlags1], a
 	call GetScrollingMenuJoypad
+	ldh a, [hJoyPressed]
+	and PAD_B
+	jr z, .check_input
+	ldh a, [hJoyDown]
+	and PAD_SELECT
+	jr z, .check_input
+	farcall MainMenu_ToggleDebugMenu
+	jr .loop
+.check_input
 	ld a, [wMenuJoypad]
 	cp PAD_B
 	jr z, .b_button
