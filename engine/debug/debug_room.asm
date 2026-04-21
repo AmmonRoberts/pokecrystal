@@ -254,6 +254,7 @@ _DebugRoom::
 	db "HELD ITEM RND@"
 	db "MODERN HELD@"
 	db "ITEM RATE@"
+	db "STATIC RANDO@"
 .Jumptable:
 ; entries correspond to DEBUGROOMMENUITEM_* constants
 	dw DebugRoomMenu_SpClear
