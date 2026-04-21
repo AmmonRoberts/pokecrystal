@@ -1,6 +1,6 @@
 ; New-game menu option descriptions.
 ; Called via farcall from Crystal Features 1 (bank $12).
-; Resides in Crystal Features 2 (bank $22) to avoid overflowing CF1.
+; Resides in "New Game Descs" (bank $21) to avoid overflowing CF1.
 
 ShowNewGameOptionDescription:
 ; Draws a description overlay box at the bottom of the screen for the
@@ -79,6 +79,7 @@ GetNewGameOptionDescString:
 	dw .desc_type_rand
 	dw .desc_nickname
 	dw .desc_wild_held_rand
+	dw .desc_static_rand
 .DescPage3:
 	dw .desc_tm_mode
 	dw .desc_exp_mult
@@ -156,6 +157,12 @@ GetNewGameOptionDescString:
 	db "Randomizes the<LF>"
 	db "held items carried<LF>"
 	db "by wild #MON.@"
+
+.desc_static_rand:
+	db "Randomizes static<LF>"
+	db "#MON encounters<LF>"
+	db "(legends, Snorlax,<LF>"
+	db "etc.). Level kept.@"
 
 .desc_tm_mode:
 	db "UNLIMITED: TMs are<LF>"

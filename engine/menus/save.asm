@@ -998,6 +998,14 @@ _LoadData:
 	xor a
 	ld [wOWMoveMode], a
 .ow_move_mode_ok
+	; Sanitize wStaticRandMode: new variable — old saves may have garbage here.
+	; Clamp to valid range; out-of-range defaults to STATIC_RAND_STANDARD (0).
+	ld a, [wStaticRandMode]
+	cp NUM_STATIC_RAND_MODES
+	jr c, .static_rand_mode_ok
+	xor a
+	ld [wStaticRandMode], a
+.static_rand_mode_ok
 	; Regenerate the type matchup table from the saved seed.
 	; Old saves have seed=0, so the table will be filled with EFFECTIVE (flag-check also skips table use).
 	farcall GenerateTypeMatchupTable
