@@ -2808,7 +2808,7 @@ wDudeNumBalls:: db
 wDudeBalls:: ds 2 * 4 + 1
 ENDU
 
-	ds 4
+	ds 3
 
 wd430:: ; mobile
 wBattleAction:: db
@@ -2958,6 +2958,11 @@ wHMMode:: db
 wOWMoveMode:: db
 ; Field-move requirement mode for Rock Smash and Headbutt (same values as wHMMode).
 ; 0 = HM_MODE_REQUIRED (default), 1 = HM_MODE_LEARNABLE, 2 = HM_MODE_FREE.
+wStaticRandMode:: db
+; Static Pokémon encounter randomizer mode (see constants/randomizer_constants.asm).
+; 0 = STATIC_RAND_STANDARD (default): use the scripted species
+; 1 = STATIC_RAND_RANDOMIZED: replace with a random species (level preserved)
+; Old saves have 0 here (treated as STANDARD).
 wCrystalDataEnd::
 
 wCrystalFlags::

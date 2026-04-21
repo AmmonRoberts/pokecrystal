@@ -56,6 +56,7 @@ DEF DEBUGROOMMENU_NUM_PAGES EQU const_value
 	const DEBUGROOMMENUITEM_WILD_HELD_ITEM_RAND ; 2a
 	const DEBUGROOMMENUITEM_WILD_HELD_ITEM_MOD  ; 2b
 	const DEBUGROOMMENUITEM_HELD_ITEM_RATE      ; 2c
+	const DEBUGROOMMENUITEM_STATIC_RANDO        ; 2d
 
 _DebugRoom::
 	ldh a, [hJoyDown]
@@ -96,6 +97,7 @@ _DebugRoom::
 	jr nz, .status_done
 .page7_status
 	call DebugRoom_PrintHeldItemRate
+	call DebugRoom_PrintStaticRando
 	jr .status_done
 .page6_status
 	call DebugRoom_PrintBossRando
@@ -299,6 +301,7 @@ _DebugRoom::
 	dw DebugRoomMenu_WildHeldItemRand
 	dw DebugRoomMenu_WildHeldItemMod
 	dw DebugRoomMenu_HeldItemRate
+	dw DebugRoomMenu_StaticRando
 
 .MenuItems:
 ; entries correspond to DEBUGROOMMENU_* constants
@@ -376,8 +379,9 @@ _DebugRoom::
 	db -1
 
 	; DEBUGROOMMENU_PAGE_7
-	db 2
+	db 3
 	db DEBUGROOMMENUITEM_HELD_ITEM_RATE
+	db DEBUGROOMMENUITEM_STATIC_RANDO
 	db DEBUGROOMMENUITEM_NEXT
 	db -1
 
@@ -1067,6 +1071,35 @@ DebugRoom_PrintPartyLimit:
 .str_4: db "   4@"
 .str_5: db "   5@"
 .str_6: db "   6@"
+
+DebugRoomMenu_StaticRando:
+; Toggles wStaticRandMode between STATIC_RAND_STANDARD and STATIC_RAND_RANDOMIZED.
+	ld a, [wStaticRandMode]
+	inc a
+	cp NUM_STATIC_RAND_MODES
+	jr c, .ok
+	xor a
+.ok
+	ld [wStaticRandMode], a
+	ret
+
+DebugRoom_PrintStaticRando:
+	hlcoord 16, 2
+	ld de, .Label
+	call PlaceString
+	ld a, [wStaticRandMode]
+	and a
+	hlcoord 16, 3
+	ld de, .Standard
+	jr z, .ok
+	ld de, .Randomized
+.ok
+	call PlaceString
+	ret
+
+.Label:      db "STC:@"
+.Standard:   db " STD@"
+.Randomized: db "RAND@"
 
 DebugRoomMenu_GiftRando:
 	ld a, [wGiftRandMode]

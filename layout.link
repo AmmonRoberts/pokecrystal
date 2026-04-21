@@ -105,6 +105,7 @@ ROMX $20
 ROMX $21
 	"bank21"
 	"New Game Descs"
+	"Crystal Features 1 Ext"
 ROMX $22
 	"Crystal Features 2"
 ROMX $23

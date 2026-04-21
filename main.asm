@@ -302,6 +302,11 @@ SECTION "New Game Descs", ROMX
 INCLUDE "engine/menus/newgame_option_descs.asm"
 
 
+SECTION "Crystal Features 1 Ext", ROMX
+
+INCLUDE "engine/menus/newgame_options_ext.asm"
+
+
 SECTION "Crystal Features 2", ROMX
 
 INCLUDE "engine/events/kurt.asm"

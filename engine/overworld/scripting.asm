@@ -1141,7 +1141,21 @@ Script_loadtemptrainer:
 Script_loadwildmon:
 	ld a, (1 << 7)
 	ld [wBattleScriptFlags], a
-	call GetScriptByte
+	call GetScriptByte         ; a = scripted species
+	ld b, a                    ; b = default species
+	; Check static encounter randomizer
+	ld a, [wStaticRandMode]
+	cp STATIC_RAND_RANDOMIZED
+	jr nz, .use_default
+.gen_species
+	call Random
+	and a                      ; species 0 is invalid
+	jr z, .gen_species
+	cp NUM_POKEMON + 1         ; must be 1-251
+	jr nc, .gen_species
+	ld b, a                    ; b = random species
+.use_default
+	ld a, b
 	ld [wTempWildMonSpecies], a
 	call GetScriptByte
 	ld [wCurPartyLevel], a

@@ -16,8 +16,9 @@ DEF NUM_NEWGAMEOPTIONS_PAGE1 EQU const_value ; 7
 	const NEWGAMEOPT_TYPE_RAND              ; 1
 	const NEWGAMEOPT_AUTO_NICKNAME          ; 2
 	const NEWGAMEOPT_WILD_HELD_ITEM_RAND    ; 3
-	const NEWGAMEOPT_PAGE2_CONTINUE         ; 4
-DEF NUM_NEWGAMEOPTIONS_PAGE2 EQU const_value ; 5
+	const NEWGAMEOPT_STATIC_RAND            ; 4
+	const NEWGAMEOPT_PAGE2_CONTINUE         ; 5
+DEF NUM_NEWGAMEOPTIONS_PAGE2 EQU const_value ; 6
 
 ; Page 3: Modernization options
 	const_def
@@ -270,6 +271,8 @@ StringNewGameOptionsPage2:
 	db "     :<LF>"
 	db "WILD HELD ITEM<LF>"
 	db "     :<LF>"
+	db "STATIC #MON<LF>"
+	db "     :<LF>"
 	db "CONTINUE@"
 
 StringNewGameOptionsPage3:
@@ -350,6 +353,7 @@ GetNewGameOptionPointer:
 	dw NewGameOptions_TypeMatchupRandomization
 	dw NewGameOptions_AutoNickname
 	dw NewGameOptions_WildHeldItemRand
+	dw NewGameOptions_StaticRandomization
 	dw NewGameOptions_Continue
 
 .PointersPage3:
@@ -841,6 +845,12 @@ NewGameOptions_WildHeldItemRand:
 
 .Standard:       db "STANDARD  @"
 .Randomized_str: db "RANDOMIZED@"
+
+NewGameOptions_StaticRandomization:
+; Handler body lives in Crystal Features 1 Ext bank to avoid overflowing Crystal Features 1.
+	farcall StaticRandOptionHandler
+	and a
+	ret
 
 NewGameOptions_ExpMultiplier:
 	ldh a, [hJoyPressed]

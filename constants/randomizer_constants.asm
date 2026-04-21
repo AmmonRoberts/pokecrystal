@@ -25,6 +25,11 @@ DEF GIFT_RAND_RANDOMIZED EQU 1 ; random species substituted for the gift
 DEF GIFT_RAND_DISABLED   EQU 2 ; gift Pokémon are not given at all
 DEF NUM_GIFT_RAND_MODES  EQU 3
 
+; Static encounter randomizer mode (stored in wStaticRandMode, see ram/wram.asm)
+DEF STATIC_RAND_STANDARD   EQU 0 ; standard species (default)
+DEF STATIC_RAND_RANDOMIZED EQU 1 ; random species substituted, level preserved
+DEF NUM_STATIC_RAND_MODES  EQU 2
+
 ; Return codes for GiveXxxGift specials (wScriptVar)
 DEF GIFT_RESULT_DISABLED EQU 0 ; gift is disabled — nothing given
 DEF GIFT_RESULT_PARTY    EQU 1 ; Pokémon (or egg) added to the party
