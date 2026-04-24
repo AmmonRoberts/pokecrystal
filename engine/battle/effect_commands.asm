@@ -2345,7 +2345,7 @@ BattleCommand_ApplyDamage:
 	jr .done_damage
 
 .damage_player
-	call DoPlayerDamage
+	call ApplyEnemyDmgAndDamagePlayer
 
 .done_damage
 	pop bc
@@ -2372,10 +2372,9 @@ BattleCommand_ApplyDamage:
 	bit SUBSTATUS_SUBSTITUTE, a
 	ret nz
 
-	ld de, wPlayerDamageTaken + 1
 	ldh a, [hBattleTurn]
 	and a
-	jr nz, .got_damage_taken
+	ret nz ; enemy's turn: wPlayerDamageTaken updated post-scale in ApplyEnemyDmgAndDamagePlayer
 	ld de, wEnemyDamageTaken + 1
 
 .got_damage_taken
@@ -3634,7 +3633,7 @@ DoEnemyDamage:
 .did_no_damage
 	jp RefreshBattleHuds
 
-DoPlayerDamage:
+DoPlayerDamage::
 	ld hl, wCurDamage
 	ld a, [hli]
 	ld b, a

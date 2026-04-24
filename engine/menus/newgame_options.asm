@@ -36,8 +36,9 @@ DEF NUM_NEWGAMEOPTIONS_PAGE3 EQU const_value ; 7
 	const NEWGAMEOPT_TM_VENDOR           ; 0
 	const NEWGAMEOPT_WILD_HELD_ITEM_MOD  ; 1
 	const NEWGAMEOPT_HELD_ITEM_RATE      ; 2
-	const NEWGAMEOPT_PAGE4_CONTINUE      ; 3
-DEF NUM_NEWGAMEOPTIONS_PAGE4 EQU const_value ; 4
+	const NEWGAMEOPT_ENEMY_DAMAGE_MULT   ; 3
+	const NEWGAMEOPT_PAGE4_CONTINUE      ; 4
+DEF NUM_NEWGAMEOPTIONS_PAGE4 EQU const_value ; 5
 
 ; Page 5: Nuzlocke/Challenge options
 	const_def
@@ -299,6 +300,8 @@ StringNewGameOptionsPage4:
 	db "     :<LF>"
 	db "HLD ITM RATE<LF>"
 	db "     :<LF>"
+	db "ENEMY DMG<LF>"
+	db "     :<LF>"
 	db "CONTINUE@"
 
 StringNewGameOptionsPage5:
@@ -371,6 +374,7 @@ GetNewGameOptionPointer:
 	dw NewGameOptions_TMVendor
 	dw NewGameOptions_WildHeldItemMod
 	dw NewGameOptions_HeldItemRate
+	dw NewGameOptions_EnemyDamageMultiplier
 	dw NewGameOptions_Continue
 
 .PointersPage5:
@@ -764,31 +768,10 @@ NewGameOptions_PoisonSurvival:
 .Safe_str: db "SAFE    @"
 
 NewGameOptions_WildItemDrop:
-	ldh a, [hJoyPressed]
-	bit B_PAD_LEFT, a
-	jr nz, .Toggle
-	bit B_PAD_RIGHT, a
-	jr z, .NonePressed
-.Toggle:
-	ld hl, wModFlags
-	ld a, [hl]
-	xor 1 << MODFLAG_WILD_ITEM_DROP_F
-	ld [hl], a
-.NonePressed:
-	ld a, [wModFlags]
-	bit MODFLAG_WILD_ITEM_DROP_F, a
-	jr nz, .Enabled
-	ld de, .Disabled
-	jr .Display
-.Enabled:
-	ld de, .Enabled_str
-.Display:
-	hlcoord 8, 14
-	call PlaceString
+; Handler body lives in Crystal Features 1 Ext bank to avoid overflowing Crystal Features 1.
+	farcall WildItemDropOptionHandler
 	and a
 	ret
-.Disabled:    db "DISABLED@"
-.Enabled_str: db "ENABLED @"
 
 NewGameOptions_AutoNickname:
 	ldh a, [hJoyPressed]
@@ -1201,6 +1184,12 @@ NewGameOptions_HeldItemRate:
 .str_65:  db "65%  @"
 .str_75:  db "75%  @"
 .str_100: db "100% @"
+
+NewGameOptions_EnemyDamageMultiplier:
+; Handler body lives in Crystal Features 1 Ext bank to avoid overflowing Crystal Features 1.
+	farcall EnemyDamageMultiplierOptionHandler
+	and a
+	ret
 
 NewGameOptions_TMVendor:
 ; Toggles whether the TM vendor NPC appears in Blackthorn Mart (DISABLED / ENABLED).

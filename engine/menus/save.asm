@@ -969,6 +969,14 @@ _LoadData:
 	ld a, 2
 	ld [wMoneyMultiplier], a
 .money_mult_ok
+	; Sanitize wEnemyDamageMultiplier: new variable — old saves have garbage here.
+	; Clamp to valid range 0-5; out-of-range defaults to 100% (2).
+	ld a, [wEnemyDamageMultiplier]
+	cp 6
+	jr c, .enemy_dmg_mult_ok
+	ld a, 2
+	ld [wEnemyDamageMultiplier], a
+.enemy_dmg_mult_ok
 	; Sanitize wPartyLimit: old saves will have 0 here; default to PARTY_LENGTH.
 	ld a, [wPartyLimit]
 	and a

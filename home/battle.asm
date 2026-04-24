@@ -85,6 +85,18 @@ ResetDamage::
 	ld [wCurDamage + 1], a
 	ret
 
+ApplyEnemyDmgAndDamagePlayer::
+; Trampoline called from Effect Commands ($0d) in place of DoPlayerDamage.
+; Switches to Enemy Trainers ($0e) to scale wCurDamage and update wPlayerDamageTaken,
+; then switches back to Effect Commands ($0d) and jumps to DoPlayerDamage.
+; Net cost at the call site: 0 bytes (same 3-byte call instruction).
+	ld a, BANK(ScaleEnemyDamageAndUpdateTracking)
+	rst Bankswitch
+	call ScaleEnemyDamageAndUpdateTracking
+	ld a, BANK(DoPlayerDamage)
+	rst Bankswitch
+	jp DoPlayerDamage
+
 SetPlayerTurn::
 	xor a
 	ldh [hBattleTurn], a
