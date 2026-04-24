@@ -634,4 +634,121 @@ ApplyMoneyMultiplier::
 .half_done:
 	ret
 
+ScaleEnemyDamageAndUpdateTracking::
+; Scale wCurDamage by wEnemyDamageMultiplier, then record the scaled value into
+; wPlayerDamageTaken (for Counter/Mirror Coat/Bide correctness).
+; Called from the ROM0 trampoline ApplyEnemyDmgAndDamagePlayer.
+	call ApplyEnemyDamageMultiplier
+; Check if the player's substitute is active — if so, skip tracking
+; (mirrors the BATTLE_VARS_SUBSTATUS4_OPP substitute check in .update_damage_taken).
+	ld a, [wPlayerSubStatus4]
+	bit SUBSTATUS_SUBSTITUTE, a
+	ret nz
+; Add scaled wCurDamage to wPlayerDamageTaken (clamped to $ffff).
+	ld hl, wPlayerDamageTaken + 1
+	ld a, [wCurDamage + 1]
+	ld b, a
+	ld a, [hl]
+	add b
+	ld [hl], a
+	dec hl
+	ld a, [wCurDamage]
+	ld b, a
+	ld a, [hl]
+	adc b
+	ld [hl], a
+	ret nc
+	ld [hl], $ff
+	inc hl
+	ld [hl], $ff
+	ret
+
+ApplyEnemyDamageMultiplier::
+; Scale wCurDamage by wEnemyDamageMultiplier.
+; Called from Effect Commands (bank $0d) via homecall.
+; wEnemyDamageMultiplier: 0=50%, 1=75%, 2=100%, 3=125%, 4=150%
+	ld a, [wEnemyDamageMultiplier]
+	cp 2
+	ret z ; 100% - no change
+	push bc
+	ld a, [wCurDamage]
+	ld b, a
+	ld a, [wCurDamage + 1]
+	ld c, a
+	ld a, b
+	or c
+	jr z, .done  ; zero damage — nothing to scale
+	ld a, [wEnemyDamageMultiplier]
+	and a
+	jr z, .half           ; 0 = 50%
+	cp 1
+	jr z, .three_quarter  ; 1 = 75%
+	cp 3
+	jr z, .five_quarter   ; 3 = 125%
+	cp 5
+	jr z, .double         ; 5 = 200%
+	; 4 = 150%
+.one_and_half:
+	srl b
+	rr c
+	ld a, [wCurDamage + 1]
+	add c
+	ld [wCurDamage + 1], a
+	ld a, [wCurDamage]
+	adc b
+	ld [wCurDamage], a
+	jr .done
+.five_quarter:
+	srl b
+	rr c
+	srl b
+	rr c
+	ld a, [wCurDamage + 1]
+	add c
+	ld [wCurDamage + 1], a
+	ld a, [wCurDamage]
+	adc b
+	ld [wCurDamage], a
+	jr .done
+.three_quarter:
+	srl b
+	rr c
+	srl b
+	rr c
+	ld a, [wCurDamage + 1]
+	sub c
+	ld [wCurDamage + 1], a
+	ld a, [wCurDamage]
+	sbc b
+	ld [wCurDamage], a
+	jr .done
+.half:
+	srl b
+	rr c
+	ld a, b
+	or c
+	jr nz, .store_half
+	ld c, 1
+.store_half:
+	ld a, b
+	ld [wCurDamage], a
+	ld a, c
+	ld [wCurDamage + 1], a
+	jr .done
+.double:
+	; value = value * 2 (cap at $ffff)
+	sla c
+	rl b
+	jr nc, .store_double
+	ld b, $ff
+	ld c, $ff
+.store_double:
+	ld a, b
+	ld [wCurDamage], a
+	ld a, c
+	ld [wCurDamage + 1], a
+.done:
+	pop bc
+	ret
+
 INCLUDE "data/trainers/parties.asm"

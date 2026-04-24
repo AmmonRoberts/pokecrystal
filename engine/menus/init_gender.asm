@@ -16,6 +16,9 @@ InitCrystalData:
 	ld a, 2 ; default money multiplier = 100%
 	ld [wMoneyMultiplier], a
 	xor a
+	ld a, 2 ; default enemy damage multiplier = 100%
+	ld [wEnemyDamageMultiplier], a
+	xor a
 	ld [wRandomStarter1], a
 	ld [wRandomStarter2], a
 	ld [wRandomStarter3], a

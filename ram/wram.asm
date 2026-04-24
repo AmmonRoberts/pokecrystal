@@ -2963,6 +2963,15 @@ wStaticRandMode:: db
 ; 0 = STATIC_RAND_STANDARD (default): use the scripted species
 ; 1 = STATIC_RAND_RANDOMIZED: replace with a random species (level preserved)
 ; Old saves have 0 here (treated as STANDARD).
+wEnemyDamageMultiplier::
+; 0 = 50% enemy damage (enemy deals less damage)
+; 1 = 75% enemy damage
+; 2 = 100% enemy damage (default)
+; 3 = 125% enemy damage
+; 4 = 150% enemy damage
+; 5 = 200% enemy damage
+; Old saves have garbage here; sanitized to 2 (100%) on load.
+	db
 wCrystalDataEnd::
 
 wCrystalFlags::
@@ -3232,7 +3241,7 @@ wKenjiFightCount::   db ; unreferenced
 wParryFightCount::   db
 wErinFightCount::    db
 
-	ds 58
+	ds 57
 
 wEventFlags:: flag_array NUM_EVENTS
 

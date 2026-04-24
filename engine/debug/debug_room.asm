@@ -57,6 +57,7 @@ DEF DEBUGROOMMENU_NUM_PAGES EQU const_value
 	const DEBUGROOMMENUITEM_WILD_HELD_ITEM_MOD  ; 2b
 	const DEBUGROOMMENUITEM_HELD_ITEM_RATE      ; 2c
 	const DEBUGROOMMENUITEM_STATIC_RANDO        ; 2d
+	const DEBUGROOMMENUITEM_ENEMY_DMG_MULT      ; 2e
 
 _DebugRoom::
 	ldh a, [hJoyDown]
@@ -98,6 +99,7 @@ _DebugRoom::
 .page7_status
 	call DebugRoom_PrintHeldItemRate
 	call DebugRoom_PrintStaticRando
+	call DebugRoom_PrintEnemyDmgMult
 	jr .status_done
 .page6_status
 	call DebugRoom_PrintBossRando
@@ -255,6 +257,7 @@ _DebugRoom::
 	db "MODERN HELD@"
 	db "ITEM RATE@"
 	db "STATIC RANDO@"
+	db "ENEMY DMG@"
 .Jumptable:
 ; entries correspond to DEBUGROOMMENUITEM_* constants
 	dw DebugRoomMenu_SpClear
@@ -303,6 +306,7 @@ _DebugRoom::
 	dw DebugRoomMenu_WildHeldItemMod
 	dw DebugRoomMenu_HeldItemRate
 	dw DebugRoomMenu_StaticRando
+	dw DebugRoomMenu_EnemyDmgMult
 
 .MenuItems:
 ; entries correspond to DEBUGROOMMENU_* constants
@@ -380,9 +384,10 @@ _DebugRoom::
 	db -1
 
 	; DEBUGROOMMENU_PAGE_7
-	db 3
+	db 4
 	db DEBUGROOMMENUITEM_HELD_ITEM_RATE
 	db DEBUGROOMMENUITEM_STATIC_RANDO
+	db DEBUGROOMMENUITEM_ENEMY_DMG_MULT
 	db DEBUGROOMMENUITEM_NEXT
 	db -1
 
@@ -1008,6 +1013,16 @@ DebugRoomMenu_ExpMult:
 	ld [wExpMultiplier], a
 	ret
 
+DebugRoomMenu_EnemyDmgMult:
+	ld a, [wEnemyDamageMultiplier]
+	inc a
+	cp 6
+	jr c, .ok
+	xor a
+.ok
+	ld [wEnemyDamageMultiplier], a
+	ret
+
 DebugRoomMenu_Permafaint:
 	ld a, [wPermafaint]
 	xor 1   ; toggle bit 0 (permadeath)
@@ -1288,6 +1303,39 @@ DebugRoom_PrintExpMult:
 .str_100: db "1.00@"
 .str_125: db "1.25@"
 .str_150: db "1.50@"
+
+DebugRoom_PrintEnemyDmgMult:
+	hlcoord 16, 4
+	ld de, .Label
+	call PlaceString
+	ld a, [wEnemyDamageMultiplier]
+	ld e, a
+	ld d, 0
+	ld hl, .Strings
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	hlcoord 16, 5
+	call PlaceString
+	ret
+
+.Label:
+	db "EDM:@"
+.Strings:
+	dw .str_050
+	dw .str_075
+	dw .str_100
+	dw .str_125
+	dw .str_150
+	dw .str_200
+.str_050: db "0.50@"
+.str_075: db "0.75@"
+.str_100: db "1.00@"
+.str_125: db "1.25@"
+.str_150: db "1.50@"
+.str_200: db "2.00@"
 
 DebugRoomMenu_WarpTo:
 	; Initialise the last-group tracker so the auto function doesn't fire a
