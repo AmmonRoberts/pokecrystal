@@ -2872,7 +2872,7 @@ wTimeCyclesSinceLastCall:: db
 wReceiveCallDelay_MinsRemaining:: db
 wReceiveCallDelay_StartTime:: ds 3
 
-	ds 2
+	ds 1
 
 wBugContestMinsRemaining:: db
 wBugContestSecsRemaining:: db
@@ -2970,6 +2970,15 @@ wEnemyDamageMultiplier::
 ; 3 = 125% enemy damage
 ; 4 = 150% enemy damage
 ; 5 = 200% enemy damage
+; Old saves have garbage here; sanitized to 2 (100%) on load.
+	db
+wPlayerDamageMultiplier::
+; 0 = 50% player damage (player deals less damage)
+; 1 = 75% player damage
+; 2 = 100% player damage (default)
+; 3 = 125% player damage
+; 4 = 150% player damage
+; 5 = 200% player damage
 ; Old saves have garbage here; sanitized to 2 (100%) on load.
 	db
 wCrystalDataEnd::

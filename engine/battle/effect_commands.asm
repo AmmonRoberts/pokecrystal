@@ -2341,7 +2341,7 @@ BattleCommand_ApplyDamage:
 	ldh a, [hBattleTurn]
 	and a
 	jr nz, .damage_player
-	call DoEnemyDamage
+	callfar ScalePlayerDmgAndDamageEnemy
 	jr .done_damage
 
 .damage_player
@@ -3560,7 +3560,7 @@ PlayFXAnimID:
 	callfar PlayBattleAnim
 	ret
 
-DoEnemyDamage:
+DoEnemyDamage::
 	ld hl, wCurDamage
 	ld a, [hli]
 	ld b, a
