@@ -19,6 +19,9 @@ InitCrystalData:
 	ld a, 2 ; default enemy damage multiplier = 100%
 	ld [wEnemyDamageMultiplier], a
 	xor a
+	ld a, 2 ; default player damage multiplier = 100%
+	ld [wPlayerDamageMultiplier], a
+	xor a
 	ld [wRandomStarter1], a
 	ld [wRandomStarter2], a
 	ld [wRandomStarter3], a

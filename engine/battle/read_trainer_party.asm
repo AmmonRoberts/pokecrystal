@@ -751,4 +751,30 @@ ApplyEnemyDamageMultiplier::
 	pop bc
 	ret
 
+ApplyPlayerDamageMultiplier::
+; Scale wCurDamage by wPlayerDamageMultiplier.
+; Called from Effect Commands (bank $0d) via callfar.
+; wPlayerDamageMultiplier: 0=50%, 1=75%, 2=100%, 3=125%, 4=150%, 5=200%
+; Borrows wEnemyDamageMultiplier temporarily to reuse ApplyEnemyDamageMultiplier.
+	ld a, [wPlayerDamageMultiplier]
+	cp 2
+	ret z ; 100% - no change
+	ld b, a
+	ld a, [wEnemyDamageMultiplier]
+	push af
+	ld a, b
+	ld [wEnemyDamageMultiplier], a
+	call ApplyEnemyDamageMultiplier
+	pop af
+	ld [wEnemyDamageMultiplier], a
+	ret
+
+ScalePlayerDmgAndDamageEnemy::
+; Scale wCurDamage by wPlayerDamageMultiplier, then damage the enemy.
+; Called from Effect Commands (bank $0d) via a single callfar, saving space.
+; c must be set by caller (FALSE = check substitute, TRUE = ignore substitute).
+	call ApplyPlayerDamageMultiplier
+	callfar DoEnemyDamage
+	ret
+
 INCLUDE "data/trainers/parties.asm"
