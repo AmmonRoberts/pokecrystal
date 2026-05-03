@@ -213,7 +213,7 @@ _DebugRoom::
 
 .Strings:
 ; entries correspond to DEBUGROOMMENUITEM_* constants
-	db "SP CLEAR@"
+	db "STACK CLR@"
 	db "WIN WORK CLR@"
 	db "#MON GET!@"
 	db "#DEX COMP.@"
@@ -225,8 +225,8 @@ _DebugRoom::
 	db "GB ID SET@"
 	db "BATTLE RECORD@"
 	db "#DEX CLEAR@"
-	db "HALT CHK CLR@"
-	db "BATTLE SKIP@"
+	db "RTC HALT CLR@"
+	db "ONE-HIT KO@"
 	db "HALL OF FAME@"
 	db "ROM CHECKSUM@"
 	db "PHONE DEBUG@"
@@ -1688,11 +1688,11 @@ DebugRoom_PrintBattleSkip:
 	ret
 
 .BTLString:
-	db "BTL:@"
+	db "KO:@"
 .DoString:
-	db "  DO@"
+	db " OFF@"
 .SkipString:
-	db "SKIP@"
+	db "  ON@"
 
 DebugRoomMenu_ChangeSex:
 	ld a, BANK(sCrystalData)
