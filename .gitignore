@@ -39,3 +39,5 @@ gfx/pokemon/*/frames.asm
 *.sg1
 *.bps
 *.clt
+/.agents/skills
+skills-lock.json

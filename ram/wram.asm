@@ -515,6 +515,7 @@ wAlreadyFailed:: db
 
 wBattleParticipantsIncludingFainted:: db
 wBattleLowHealthAlarm:: db
+wLowHealthAlarmCount:: db ; count of danger cycles played while in low health
 wPlayerMinimized:: db
 
 wPlayerScreens::
