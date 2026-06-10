@@ -541,9 +541,18 @@ PlayDanger:
 
 	; Play the high tone
 	and a
-	jr z, .begin
+	jr nz, .check_halfway
 
-	; Play the low tone
+	; count is zero => starting a new ding-dong cycle
+	ld hl, wLowHealthAlarmCount
+	ld a, [hl]
+	cp 3
+	jr nc, .stop_danger
+	inc [hl]
+	jr .begin
+
+.check_halfway
+	; Play the low tone at the halfway point
 	cp 16
 	jr z, .halfway
 
@@ -588,6 +597,13 @@ PlayDanger:
 	ld [wSoundOutput], a
 	ret
 
+.stop_danger
+	ld hl, wLowHealthAlarm
+	res DANGER_ON_F, [hl]
+	ld a, $1
+	ld [wBattleLowHealthAlarm], a
+	ret
+
 DangerSoundHigh:
 	db $80 ; duty 50%
 	db $e2 ; volume 14, envelope decrease sweep 2
@@ -601,14 +617,14 @@ DangerSoundLow:
 	db $86 ; restart sound
 
 FadeMusic:
-; fade music if applicable
-; usage:
-;	write to wMusicFade
-;	song fades out at the given rate
-;	load song id in wMusicFadeID
-;	fade new song in
-; notes:
-;	max # frames per volume level is $3f
+	; fade music if applicable
+	; usage:
+	;    write to wMusicFade
+	;    song fades out at the given rate
+	;    load song id in wMusicFadeID
+	;    fade new song in
+	; notes:
+	;    max # frames per volume level is $3f
 
 	; fading?
 	ld a, [wMusicFade]
@@ -618,10 +634,23 @@ FadeMusic:
 	ld a, [wMusicFadeCount]
 	and a
 	jr z, .update
-	; count down
+
+	ld a, [wMusicFadeCount]
 	dec a
 	ld [wMusicFadeCount], a
-	ret
+	; get SO1 volume
+	ld a, [wMusicFade]
+	ld d, a
+	ld a, [wVolume]
+	and AUDVOL_RIGHT
+	; which way are we fading?
+	bit MUSIC_FADE_IN_F, d
+	jr nz, .fadein
+	; fading out
+	and a
+	jr z, .novolume
+	dec a
+	jr .updatevolume
 
 .update
 	ld a, [wMusicFade]

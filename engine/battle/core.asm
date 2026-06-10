@@ -4637,26 +4637,45 @@ UpdatePlayerHPPal:
 	jp UpdateHPPal
 
 CheckDanger:
+	; Check current HP first so we can clear any prior suppression
 	ld hl, wBattleMonHP
 	ld a, [hli]
 	or [hl]
 	jr z, .no_danger
-	ld a, [wBattleLowHealthAlarm]
-	and a
-	jr nz, .done
+
+	; If HP nonzero, check HP palette (red = danger)
 	ld a, [wPlayerHPPal]
 	cp HP_RED
-	jr z, .danger
+	jr nz, .not_in_danger
 
-.no_danger
-	ld hl, wLowHealthAlarm
-	res DANGER_ON_F, [hl]
-	jr .done
+	; We're in danger: allow danger to trigger unless suppressed
+	ld a, [wBattleLowHealthAlarm]
+	and a
+	jr nz, .done ; still suppressed until HP leaves danger
 
-.danger
+	; set danger flag so PlayDanger will play
 	ld hl, wLowHealthAlarm
 	set DANGER_ON_F, [hl]
+	jr .done
 
+.not_in_danger
+	; Clear danger flag and reset counters so danger can retrigger later
+	ld hl, wLowHealthAlarm
+	res DANGER_ON_F, [hl]
+	xor a
+	ld [wLowHealthAlarmCount], a
+	xor a
+	ld [wBattleLowHealthAlarm], a
+	jr .done
+
+.no_danger
+	; HP is zero - ensure danger is cleared
+	ld hl, wLowHealthAlarm
+	res DANGER_ON_F, [hl]
+	xor a
+	ld [wLowHealthAlarmCount], a
+	xor a
+	ld [wBattleLowHealthAlarm], a
 .done
 	ret
 
@@ -8516,6 +8535,8 @@ CleanUpBattleRAM:
 	call BattleEnd_HandleRoamMons
 	xor a
 	ld [wLowHealthAlarm], a
+	ld [wLowHealthAlarmCount], a
+	ld [wBattleLowHealthAlarm], a
 	ld [wBattleMode], a
 	ld [wBattleType], a
 	ld [wAttackMissed], a
