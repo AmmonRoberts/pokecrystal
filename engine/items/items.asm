@@ -497,7 +497,7 @@ _CheckTossableItem::
 	ld a, ITEMATTR_PERMISSIONS
 	call GetItemAttr
 	bit CANT_TOSS_F, a
-	jr nz, ItemAttr_ReturnCarry
+	jp nz, ItemAttr_ReturnCarry
 	and a
 	ret
 
@@ -506,7 +506,7 @@ CheckSelectableItem:
 	ld a, ITEMATTR_PERMISSIONS
 	call GetItemAttr
 	bit CANT_SELECT_F, a
-	jr nz, ItemAttr_ReturnCarry
+	jp nz, ItemAttr_ReturnCarry
 	and a
 	ret
 
@@ -533,6 +533,98 @@ CheckItemMenu:
 	swap a
 	and $f
 	ld [wItemAttributeValue], a
+	ret
+
+GetShopBagItemQuantity::
+; Return the quantity of wCurItem currently held in the player's bag, but
+; only counting the item, ball, and TM/HM pockets (key items are excluded).
+; Multiple stacks of the same item are summed together, so the total can
+; exceed 255 (up to MAX_ITEMS * MAX_ITEM_STACK = 3960), hence the 2-byte
+; result. Result is written to hBagItemQuantity (big-endian: high byte
+; first) only, since this is farcalled from another bank and rst FarCall
+; does not reliably preserve registers across the bank round-trip.
+	ld a, [wCurItem]
+	cp -1
+	jr z, .zero
+	call CheckItemPocket
+	ld a, [wItemAttributeValue]
+	cp ITEM
+	jr z, .item
+	cp BALL
+	jr z, .ball
+	cp TM_HM
+	jr z, .tmhm
+	jr .zero
+
+.item
+	ld de, 0
+	ld a, [wCurItem]
+	ld b, a
+	ld hl, wItems
+.loop_item
+	ld a, [hli]
+	cp -1
+	jr z, .done_item
+	cp b
+	jr nz, .skip_item_qty
+	ld a, [hl]
+	call .add_a_to_de
+.skip_item_qty
+	inc hl
+	jr .loop_item
+.done_item
+	jr .store
+
+.ball
+	ld de, 0
+	ld a, [wCurItem]
+	ld b, a
+	ld hl, wBalls
+.loop_ball
+	ld a, [hli]
+	cp -1
+	jr z, .store
+	cp b
+	jr nz, .skip_ball_qty
+	ld a, [hl]
+	call .add_a_to_de
+.skip_ball_qty
+	inc hl
+	jr .loop_ball
+
+.tmhm
+	ld a, [wCurItem]
+	cp TM01
+	jr c, .zero
+	ld c, a
+	call GetTMHMNumber
+	dec c
+	ld hl, wTMsHMs
+	add hl, bc
+	ld a, [hli]
+	ld d, 0
+	ld e, a
+	jr .store
+
+.zero
+	ld de, 0
+
+.store
+	ld a, d
+	ld [hBagItemQuantity], a
+	ld a, e
+	ld [hBagItemQuantity + 1], a
+	ret
+
+.add_a_to_de
+; Add a (0-99) to the 16-bit accumulator in de.
+	push hl
+	ld l, a
+	ld h, 0
+	add hl, de
+	ld d, h
+	ld e, l
+	pop hl
 	ret
 
 GetItemAttr:

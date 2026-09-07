@@ -27,8 +27,8 @@ PlaceMenuItemQuantity:
 .done
 	ret
 
-PlaceMoneyTopRight:
-	ld hl, MoneyTopRightMenuHeader
+PlaceMoneyTopLeft:
+	ld hl, MoneyTopLeftMenuHeader
 	call CopyMenuHeader
 	jr PlaceMoneyTextbox
 
@@ -38,7 +38,7 @@ PlaceMoneyBottomLeft:
 	jr PlaceMoneyTextbox
 
 PlaceMoneyAtTopLeftOfTextbox:
-	ld hl, MoneyTopRightMenuHeader
+	ld hl, MoneyTopLeftMenuHeader
 	lb de, 0, 11
 	call OffsetMenuHeader
 
@@ -52,11 +52,44 @@ PlaceMoneyTextbox:
 	call PrintNum
 	ret
 
-MoneyTopRightMenuHeader:
+MoneyTopLeftMenuHeader:
 	db MENU_BACKUP_TILES ; flags
 	menu_coords 11, 0, SCREEN_WIDTH - 1, 2
 	dw NULL
 	db 1 ; default option
+
+BagCountMenuHeader:
+	db MENU_BACKUP_TILES ; flags
+	menu_coords 0, 0, 9, 3
+	dw NULL
+	db 1 ; default option
+
+PlaceMoneyBagCountTopRight:
+	ld hl, BagCountMenuHeader
+	call LoadMenuHeader
+	call MenuBox
+	call MenuBoxCoord2Tile
+
+	; Label the box to make the count understandable.
+	ld de, BagCountLabel
+	hlcoord 1, 1
+	call PlaceString
+
+	; Print the current bag quantity on the second row of the box.
+	; Compute the quantity first: GetShopBagItemQuantity is farcalled into
+	; another bank and clobbers hl as a scratch pointer, so the screen
+	; coordinate must be loaded afterward.
+	farcall GetShopBagItemQuantity
+	; Read the result from memory: rst FarCall does not reliably preserve
+	; registers across the bank round-trip, so the callee (items.asm)
+	; writes its result to hBagItemQuantity instead. The total can exceed
+	; 255 when multiple stacks of the same item are summed, so it's a
+	; 2-byte (big-endian) value, printed as up to 4 digits.
+	hlcoord 1, 2
+	ld de, hBagItemQuantity
+	lb bc, PRINTNUM_LEFTALIGN | 2, 4
+	call PrintNum
+	ret
 
 MoneyBottomLeftMenuHeader:
 	db MENU_BACKUP_TILES ; flags
@@ -105,6 +138,8 @@ DisplayMoneyAndCoinBalance:
 
 MoneyString:
 	db "MONEY@"
+BagCountLabel:
+	db "IN BAG@"
 CoinString:
 	db "COIN@"
 ShowMoney_TerminatorString:
