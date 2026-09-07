@@ -175,6 +175,11 @@ hClockResetTrigger:: db
 hDebugRoomMenuCursor::
 hDayCareBoxResult:: db ; 0 = mon went to party; 1 = mon sent to PC box
 
-	ds 18
+hBagItemQuantity:: dw
+; Total quantity of an item across every stack in its pocket, used by
+; GetShopBagItemQuantity. Wide enough for MAX_ITEMS * MAX_ITEM_STACK (3960).
+; This is farcalled cross-bank, so the result can't be trusted in a register.
+
+	ds 16
 
 ENDSECTION

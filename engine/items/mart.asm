@@ -536,7 +536,9 @@ StandardMartAskPurchaseQuantity:
 	ld [wItemQuantity], a
 	ld a, MARTTEXT_HOW_MANY
 	call LoadBuyMenuText
+	farcall PlaceMoneyBagCountTopRight
 	farcall SelectQuantityToBuy
+	call ExitMenu
 	call ExitMenu
 	ret
 
@@ -593,7 +595,9 @@ RooftopSaleAskPurchaseQuantity:
 	call .GetSalePrice
 	ld a, MAX_ITEM_STACK
 	ld [wItemQuantity], a
+	farcall PlaceMoneyBagCountTopRight
 	farcall RooftopSale_SelectQuantityToBuy
+	call ExitMenu
 	call ExitMenu
 	ret
 
